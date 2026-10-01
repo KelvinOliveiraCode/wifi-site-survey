@@ -287,16 +287,28 @@ def dimensionar(
 
     Compute how many APs a floor needs, using three independent criteria.
 
-    O maior dos tres vence, porque eles medem coisas diferentes:
+    Os tres medem limites diferentes, e por isso nenhum decide sozinho:
 
-    - **cobertura** - quantos APs a area exige, pela densidade de projeto;
-    - **populacao** - quantos APs a populacao exige, dividindo pela
-      capacidade de um AP em 5 GHz a 80 MHz, que e o cenario de projeto
-      padrao de um AP novo;
-    - **area por cliente** - quantas "rodadas" de populacao o andar consegue
-      comportar. Com 35 m2 por cliente, um andar de 350 m2 comporta 10
-      confortavelmente; se o projeto diz 40 pessoas la dentro, sao quatro
-      rodadas, e a area vira o gargalo antes do AP virar.
+    - **cobertura** - quantos APs a area exige, pela densidade de projeto de
+      4 APs por 1000 m2. Um andar de 540 m2 pede 3.
+    - **populacao** - quantos APs a populacao exige, dividindo pela capacidade
+      de um AP em 5 GHz a 80 MHz (100 clientes). Noventa pessoas pedem 1.
+    - **ocupacao** - o criterio de area por cliente, que e o unico que
+     cresce. Com 35 m2 por cliente, 540 m2 comportam 15 pessoas confortavelmente.
+      Noventa pessoas num andar que comporta quinze sao seis rodadas.
+
+    O criterio de ocupacao entra **somando**, nao multiplicando. Multiplicar
+    cobertura por rodadas foi a primeira versao, e ela e errada por um motivo
+    que so aparece quando os numeros ficam grandes: `por_cobertura *
+    rodadas` trata "seis rodadas de gente" como "seis vezes mais AP de
+    cobertura", o que nao tem lectura fisica. Um andar de 100 m2 com 200
+    pessoas dava 70 APs - e a area nem e o problema, o problema sao as 200
+    pessoas. O resultado correto e `por_cobertura + rodadas - 1`: a cobertura
+    de base, mais uma unidade de capacidade para cada rodada alem da primeira.
+
+    Com essa soma, 540 m2 e 90 pessoas dao 3 + 6 - 1 = 8 APs. E um numero que
+    alguem consegue defender em reuniao: tres para cobrir o espaco, cinco para
+    dar conta da gente.
 
     Args:
         aps: APs encontrados no varrimento.
@@ -323,7 +335,12 @@ def dimensionar(
     capacidade_espacial = area_m2 / params.criterios["area_por_cliente_m2"]
     rodadas = max(1, math.ceil(clientes / capacidade_espacial)) if capacidade_espacial > 0 else 1
 
-    necessarios = max(por_cobertura, por_populacao, por_cobertura * rodadas if clientes else 1)
+    # A cobertura de base, mais uma unidade para cada rodada alem da primeira.
+    # Subtrair 1 evita contar a primeira rodada duas vezes: com uma unica
+    # rodada, o resultado e so a cobertura.
+    por_ocupacao = por_cobertura + rodadas - 1
+
+    necessarios = max(por_cobertura, por_populacao, por_ocupacao)
 
     return Dimensionamento(
         area_m2=area_m2,

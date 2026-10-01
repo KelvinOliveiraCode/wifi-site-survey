@@ -34,3 +34,4 @@ Desktop.ini
 .vscode/
 # Scripts temporarios de sessao
 tmp_*.py
+tmp_msg.txt

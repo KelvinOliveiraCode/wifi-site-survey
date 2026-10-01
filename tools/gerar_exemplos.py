@@ -27,7 +27,9 @@ from wifisurvey.capacidade import Parametros, dimensionar, verifica_projeto  # n
 from wifisurvey.interferencia import (  # noqa: E402
     canal_recomendado,
     conflito_de_canal,
+    contagem_por_canal,
     indices_de_conflito,
+    larguras_por_canal,
 )
 from wifisurvey.leitor import carregar  # noqa: E402
 from wifisurvey.mapa import _png_data_uri, escrever_png, gerar_relatorio  # noqa: E402
@@ -54,8 +56,10 @@ def gerar_andar(andar: str, pop: int, params: Parametros) -> None:
     """
     aps = carregar(RAIZ / "dados" / f"varrimento-{andar}.csv")
     dim = dimensionar(aps, LARGURA_M * ALTURA_M, pop, params)
-    c24 = sorted({r.canal for a in aps for r in a.redes if r.banda == "2.4"})
-    c5 = sorted({r.canal for a in aps for r in a.redes if r.banda == "5"})
+    redes = [r for a in aps for r in a.redes]
+    c24 = sorted({r.canal for r in redes if r.banda == "2.4"})
+    c5 = sorted({r.canal for r in redes if r.banda == "5"})
+    larguras = larguras_por_canal(redes)
 
     html = gerar_relatorio(
         andar=andar,
@@ -66,11 +70,13 @@ def gerar_andar(andar: str, pop: int, params: Parametros) -> None:
         dimensao=dim,
         problemas=verifica_projeto(aps, params),
         conflitos=indices_de_conflito(aps),
-        conflito_canais=conflito_de_canal([r for a in aps for r in a.redes]),
+        conflito_canais=conflito_de_canal(redes),
+        contagem_canais=contagem_por_canal(redes),
         canais_24=c24,
+        larguras=larguras,
         canais_5=c5,
-        recomendado_24=canal_recomendado("2.4", 20, c24),
-        recomendado_5=canal_recomendado("5", 20, c5),
+        recomendado_24=canal_recomendado("2.4", 20, c24, larguras),
+        recomendado_5=canal_recomendado("5", 20, c5, larguras),
         planta_png=_png_data_uri(aps, LARGURA_M, ALTURA_M),
     )
 

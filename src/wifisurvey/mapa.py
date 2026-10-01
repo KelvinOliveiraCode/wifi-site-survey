@@ -137,7 +137,32 @@ def cor_para_rssi(
     )
 
 
-def rssi_estimado(aps: list[AccessPoint], x: float, y: float) -> float:
+def cor_css(rgb: tuple[int, int, int]) -> str:
+    """Formata uma cor no formato que o CSS entende.
+
+    Format a colour the way CSS understands it.
+
+    ``cor_para_rssi`` devolve uma tupla ``(r, g, b)``. Interpolar a tupla
+    direto num f-string produz ``rgb((198, 40, 40))``, com dois parenteses, e o
+    navegador descarta a declaracao inteira sem avisar: a cor de fundo da
+    legenda simplesmente nao aparecia, e o HTML gerado parecia correto em
+    qualquer inspecao de texto. Formatar aqui e o que impede a regressao.
+
+    Args:
+        rgb: Tupla de tres canais em 0-255.
+
+    Returns:
+        No formato ``rgb(r, g, b)``, sem espaco - compativel com CSS.
+    """
+    r, g, b = rgb
+    return f"rgb({r},{g},{b})"
+
+
+def rssi_estimado(
+    aps: list[AccessPoint],
+    x: float,
+    y: float,
+) -> float:
     """Estima o sinal em um ponto, pelo AP mais forte.
 
     Estimate the signal at a point, from the strongest AP.
@@ -457,7 +482,9 @@ def gerar_relatorio(
     problemas: list[str],
     conflitos: dict[str, list[str]],
     conflito_canais: dict[int, list[str]],
+    contagem_canais: dict[int, int],
     canais_24: list[int],
+    larguras: dict[int, int],
     canais_5: list[int],
     recomendado_24: int,
     recomendado_5: int,
@@ -477,7 +504,9 @@ def gerar_relatorio(
         problemas: Problemas de projeto encontrados.
         conflitos: APs em conflito por sobreposicao de canal.
         conflito_canais: Redes disputando o mesmo canal.
+        contagem_canais: Quantos BSSID disputam cada canal.
         canais_24: Canais 2.4 GHz em uso.
+        larguras: Largura ja em uso em cada canal ocupado.
         canais_5: Canais 5 GHz em uso.
         recomendado_24: Canal 2.4 GHz recomendado.
         recomendado_5: Canal 5 GHz recomendado.
@@ -568,9 +597,9 @@ populacao prevista {populacao}. Dados ficticios.</p>
 
 <h2>Mapa de calor de RSSI</h2>
 <div class="legenda">
-<div style="background:rgb({cor_para_rssi(minimo, minimo, maximo)})">{minimo:.1f} dBm</div>
-<div style="background:rgb({cor_para_rssi((minimo + maximo) / 2, minimo, maximo)})">{(minimo + maximo) / 2:.1f} dBm</div>
-<div style="background:rgb({cor_para_rssi(maximo, minimo, maximo)})">{maximo:.1f} dBm</div>
+<div style="background:{cor_css(cor_para_rssi(minimo, minimo, maximo))}">{minimo:.1f} dBm</div>
+<div style="background:{cor_css(cor_para_rssi((minimo + maximo) / 2, minimo, maximo))}">{(minimo + maximo) / 2:.1f} dBm</div>
+<div style="background:{cor_css(cor_para_rssi(maximo, minimo, maximo))}">{maximo:.1f} dBm</div>
 </div>
 <div class="mapa">{img}</div>
 <p class="nota">Fonte da imagem: {esc(src_png)}. A escala acompanha a faixa
@@ -604,7 +633,7 @@ continua: entre dois pontos visitados o valor e desenhado, nao observado.</p>
 
 <h2>Redes disputando o mesmo canal</h2>
 <table>
-<tr><th>Canal</th><th>SSIDs</th><th>Quantidade</th></tr>
+<tr><th>Canal</th><th>SSIDs</th><th>Radios em disputa</th></tr>
 {linhas_conflito}
 </table>
 

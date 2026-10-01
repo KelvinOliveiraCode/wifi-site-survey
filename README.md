@@ -88,7 +88,7 @@ exige que os três acionem o detector correspondente.
 | Canais 2.4 GHz | 1, 6, 11 | 1, 6, 11 | 1, 6, 11 |
 | Canais 5 GHz | 36, 52, 100, 149 | 36, 52, 100, 149 | 36, 52, 100 |
 | Canais disputados | 7 | 7 | 4 |
-| Dimensionamento | falta 1 AP | correto | falta 13 AP |
+| Dimensionamento | falta 1 AP | correto | falta 3 AP |
 | **O que ensina** | conflito de canal | aglomerado | falta de cobertura |
 
 **andar1 — o espectro está saturado.** Os três canais de 2.4 GHz canônicos estão
@@ -101,11 +101,15 @@ sinal bom, e mesmo assim há um aglomerado: dois APs a 0,9 m um do outro contra
 3,6 m de distância típica dos demais. É o erro de instalação mais comum que não
 aparece em nenhuma ferramenta que só olha RSSI.
 
-**andar3 — e aqui está a lição.** Cinco APs duais comportam 200 clientes, para
-90 pessoas. A capacidade de clientes **sobra**. E ainda assim o andar está
-subdimensionado: são 6 m² por pessoa contra os 35 m² de projeto, e é a **área**
-que vira o gargalo, não o AP. Um relatório que mostrasse só capacidade diria que
-esse andar está ótimo.
+**andar3 - e aqui está a lição.** Cinco APs duais comportam 200
+clientes, para 90 pessoas. A capacidade de clientes **sobra**: sobram 110. E
+ainda assim o andar está subdimensionado — são 6 m² por pessoa contra os
+35 m² de projeto, e é a **área** que vira o gargalo, não o AP. São 8
+APs necessários contra os 5 instalados, por causa do critério de
+ocupação: 540 m² comportam 15 pessoas confortavelmente, e há 90.
+
+Um relatório que mostrasse só capacidade diria que esse andar está ótimo,
+com folga de 110 clientes.
 
 ## Como funciona
 

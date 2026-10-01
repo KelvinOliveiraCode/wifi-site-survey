@@ -27,7 +27,9 @@ from .interferencia import (
     canais_validos,
     canal_recomendado,
     conflito_de_canal,
+    contagem_por_canal,
     indices_de_conflito,
+    larguras_por_canal,
 )
 from .leitor import CsvInvalido, carregar
 from .mapa import _png_data_uri, escrever_png, gerar_relatorio
@@ -99,6 +101,8 @@ def _html_do_andar(andar: str, dados: Path, params: Parametros) -> str:
     """
     aps, dim, problemas = _carga_do_andar(andar, dados, params)
     c24, c5 = _canais(aps)
+    redes = [r for a in aps for r in a.redes]
+    larguras = larguras_por_canal(redes)
 
     return gerar_relatorio(
         andar=andar,
@@ -109,11 +113,13 @@ def _html_do_andar(andar: str, dados: Path, params: Parametros) -> str:
         dimensao=dim,
         problemas=problemas,
         conflitos=indices_de_conflito(aps),
-        conflito_canais=conflito_de_canal([r for a in aps for r in a.redes]),
+        conflito_canais=conflito_de_canal(redes),
+        contagem_canais=contagem_por_canal(redes),
         canais_24=c24,
+        larguras=larguras,
         canais_5=c5,
-        recomendado_24=canal_recomendado("2.4", 20, c24),
-        recomendado_5=canal_recomendado("5", 20, c5),
+        recomendado_24=canal_recomendado("2.4", 20, c24, larguras),
+        recomendado_5=canal_recomendado("5", 20, c5, larguras),
         planta_png=_png_data_uri(aps, 30.0, 18.0),
     )
 

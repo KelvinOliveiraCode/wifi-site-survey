@@ -246,8 +246,9 @@ def indices_de_conflito(aps: list[AccessPoint]) -> dict[str, list[str]]:
 
 def canal_recomendado(
     banda: str,
-   largura: int,
+    largura: int,
     ocupados: list[int],
+    larguras_ocupadas: dict[int, int] | None = None,
 ) -> int:
     """Escolhe o canal menos perturbado para um novo AP.
 
@@ -260,6 +261,10 @@ def canal_recomendado(
         banda: ``2.4`` ou ``5``.
         largura: Largura do canal novo em MHz.
         ocupados: Canais ja em uso no andar.
+        larguras_ocupadas: Largura ja em uso em cada canal ocupado. Sem este
+            mapa, todo ocupante e tratado como 20 MHz - e um emissor de 80 MHz
+            no canal 36, que ocupa 36 a 48, seria visto como se ocupasse so o
+            36. A funcao entao recomendaria o canal 44, que nao esta livre.
 
     Returns:
         O canal recomendado.
@@ -275,6 +280,8 @@ def canal_recomendado(
     # receberia uma recomendacao para 80 MHz em 2.4 GHz, que nao existe.
     faixa_ocupada(candidatos[0], largura, banda)
 
+    larguras = larguras_ocupadas or {}
+
     melhor = candidatos[0]
     menor_perturbacao: int | None = None
 
@@ -284,7 +291,8 @@ def canal_recomendado(
         perturbacao = 0
         for usado in ocupados:
             try:
-                inicio_u, fim_u = faixa_ocupada(usado, 20, banda)
+                largura_usada = larguras.get(usado, 20)
+                inicio_u, fim_u = faixa_ocupada(usado, largura_usada, banda)
             except CanalInvalido:
                 # Dado sujo: um canal de outra banda na lista. Ignorar em vez
                 # de quebrar e o comportamento certo para um relatorio.
@@ -318,16 +326,70 @@ def conflito_de_canal(redes: list[Rede]) -> dict[int, list[str]]:
 
     Returns:
         Dicionario ``canal -> lista de SSIDs unicos`` somente para canais com
-        mais de um BSSID.
+        mais de um BSSID. Para a quantidade de radios, veja
+        :func:`contagem_por_canal`.
     """
     por_canal: dict[int, dict[str, str]] = {}
     for rede in redes:
         por_canal.setdefault(rede.canal, {}).setdefault(rede.bssid, rede.ssid)
 
-    return dict(
-        sorted(
-            (canal, sorted(set(ssids.values())))
-            for canal, ssids in por_canal.items()
-            if len(ssids) > 1
-        )
-    )
+    return {
+        canal: sorted(set(ssids.values()))
+        for canal, ssids in sorted(por_canal.items())
+        if len(ssids) > 1
+    }
+
+
+def contagem_por_canal(redes: list[Rede]) -> dict[int, int]:
+    """Conta quantos BSSID disputam cada canal.
+
+    Count how many BSSIDs contend for each channel.
+
+    ``conflito_de_canal`` devolve os **nomes** das redes em conflito, sem
+    repeticao de SSID - certo para exibir. Para dizer quantos radios estao
+    disputando o canal, o SSID nao serve: tres APs transmitindo "CORP-TI" no
+    canal 36 sao tres radios disputando o mesmo espectro, e a lista de nomes
+    tem um item so. Quem mostra a contagem precisa deste numero, e nao do
+    tamanho da lista de nomes.
+
+    Args:
+        redes: Redes do andar.
+
+    Returns:
+        Dicionario ``canal -> quantidade de BSSIDs``, com o mesmo filtro de
+        ``conflito_de_canal``: so canais com mais de um BSSID.
+    """
+    por_canal: dict[int, set[str]] = {}
+    for rede in redes:
+        por_canal.setdefault(rede.canal, set()).add(rede.bssid)
+
+    return {
+        canal: len(bssids)
+        for canal, bssids in sorted(por_canal.items())
+        if len(bssids) > 1
+    }
+
+
+def larguras_por_canal(redes: list[Rede]) -> dict[int, int]:
+    """Mapeia cada canal ocupado para a largura mais larga que o usa.
+
+    Map each occupied channel to the widest width using it.
+
+    Um canal pode ter varias redes, e nem todas com a mesma largura. A mais
+    larga e a que manda: e ela que define a faixa realmente ocupada, e portanto
+    a que atrapalha mais os vizinhos. Passar esse mapa para
+    :func:`canal_recomendado` e o que impede de recomendar um canal que um
+    emissor largo ja cobre.
+
+    Args:
+        redes: Redes do andar.
+
+    Returns:
+        Dicionario ``canal -> largura em MHz``.
+    """
+    larguras: dict[int, int] = {}
+    for rede in redes:
+        atual = larguras.get(rede.canal)
+        if atual is None or rede.largura_canal > atual:
+            larguras[rede.canal] = rede.largura_canal
+    return larguras

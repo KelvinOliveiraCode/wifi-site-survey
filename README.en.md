@@ -86,7 +86,7 @@ Each floor exists to demonstrate a different problem, and
 | 2.4 GHz channels | 1, 6, 11 | 1, 6, 11 | 1, 6, 11 |
 | 5 GHz channels | 36, 52, 100, 149 | 36, 52, 100, 149 | 36, 52, 100 |
 | Contested channels | 7 | 7 | 4 |
-| Sizing | 1 AP short | correct | 13 APs short |
+| Sizing | 1 AP short | correct | 3 APs short |
 | **What it teaches** | channel conflict | clustering | coverage shortfall |
 
 **andar1 — the spectrum is saturated.** All three canonical 2.4 GHz channels
@@ -100,11 +100,15 @@ signal, and still a cluster: two APs 0.9 m apart against 3.6 m of typical
 spacing for the rest. It is the most common installation mistake that no
 RSSI-only tool will ever report.
 
-**andar3 — and here is the lesson.** Five dual-band APs support 200 clients for
-90 people. Client capacity **is not short**. The floor is still undersized: it
-is 6 m² per person against the 35 m² design guideline, so **area** is the
-bottleneck, not the AP. A report showing capacity alone would call this floor
-fine.
+**andar3 - and here is the lesson.** Five dual-band APs support 200
+clients for 90 people. Client capacity is not short — 110 to spare. And
+the floor is still undersized: it is 6 m² per person against the 35 m²
+design guideline, so **area** is the bottleneck, not the AP. Eight APs are
+required against the five installed, on account of the occupancy
+criterion: 540 m² comfortably holds 15 people, and there are 90.
+
+A report showing capacity alone would call this floor fine, with 110
+clients to spare.
 
 ## How it works
 
@@ -221,8 +225,8 @@ for problem in verifica_projeto(aps, params):
 ```
 
 ```
-faltam 13 AP(s): 5 instalado(s) para 18 necessario(s)
-13 AP(s) short, capacity 200
+faltam 3 AP(s): 5 instalado(s) para 8 necessario(s)
+3 AP(s) short, capacity 200
 ```
 
 Module, function and field names stay in Portuguese to match the portfolio and
