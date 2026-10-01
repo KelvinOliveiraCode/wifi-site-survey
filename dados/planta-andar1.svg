@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 396" width="660" height="396">
+<!-- planta ficticia do andar1: 30 m x 18 m -->
+<rect x="0" y="0" width="660" height="396" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<line x1="0" y1="0" x2="0" y2="396" stroke="#e2e2e2"/>
+<line x1="110" y1="0" x2="110" y2="396" stroke="#e2e2e2"/>
+<line x1="220" y1="0" x2="220" y2="396" stroke="#e2e2e2"/>
+<line x1="330" y1="0" x2="330" y2="396" stroke="#e2e2e2"/>
+<line x1="440" y1="0" x2="440" y2="396" stroke="#e2e2e2"/>
+<line x1="550" y1="0" x2="550" y2="396" stroke="#e2e2e2"/>
+<line x1="660" y1="0" x2="660" y2="396" stroke="#e2e2e2"/>
+<line x1="0" y1="0" x2="660" y2="0" stroke="#e2e2e2"/>
+<line x1="0" y1="110" x2="660" y2="110" stroke="#e2e2e2"/>
+<line x1="0" y1="220" x2="660" y2="220" stroke="#e2e2e2"/>
+<line x1="0" y1="330" x2="660" y2="330" stroke="#e2e2e2"/>
+<line x1="220" y1="0" x2="220" y2="396" stroke="#9a9a9a" stroke-width="3"/>
+<line x1="440" y1="0" x2="440" y2="396" stroke="#9a9a9a" stroke-width="3"/>
+</svg>

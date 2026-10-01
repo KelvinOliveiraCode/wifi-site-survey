@@ -1,0 +1,8 @@
+# Dependencias de execucao. O projeto funciona sem PyYAML: os parametros de
+# projeto embutidos em capacidade.py sao o padrao, e o YAML existe so para
+# quem quer trocar os numeros.
+PyYAML>=6.0
+
+# Dependencias de desenvolvimento.
+pytest>=7.4
+pytest-cov>=4.1

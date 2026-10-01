@@ -1,0 +1,43 @@
+# Capacidade e criterios de projeto do projeto de exemplo.
+#
+# Os numeros abaixo sao um orcamento de referencia, nao especificacao de
+# fabricante. Capacidade real muda com a banda, a largura de canal, o numero de
+# antenas, o tipo de cliente e o trafico. O que esta aqui e o valor que o
+# relatorio assume quando voce nao passa outro arquivo -- e ele e configuravel
+# justamente porque isso e uma decisao, nao uma verdade.
+#
+# Para usar os seus: copie este arquivo, ajuste os numeros e passe
+# --parametros dados/meus-parametros.yaml.
+
+capacidade:
+  # Clientes simultaneos por AP, por banda e largura de canal.
+  #
+  # 2.4 GHz carrega menos: o espectro e menor e a interferencia de vizinho e
+  # maior. Em 5 GHz o canal passa a ser o gargalo, entao quadruplicar a largura
+  # quadruplica a capacidade.
+  "2.4":
+    "20": 15
+    "40": 10
+  "5":
+    "20": 25
+    "40": 50
+    "80": 100
+    "160": 200
+
+criterios:
+  # Area confortavel por cliente, em m2. Com 35 m2, um andar de 540 m2
+  # comporta 15 pessoas sem treated como lotado.
+  area_por_cliente_m2: 35.0
+
+  # Distancia maxima entre dois APs, em m. Mais proximo que isso e
+  # interferencia: o cliente nao consegue escolher qual sinal seguir.
+  distancia_max_entre_aps_m: 15.0
+
+  # RSSI minimo aceitavel em ponto de projeto, em dBm. Abaixo disso o
+  # throughput cai mais rapido que o indicador de barras sugere, porque o
+  # cliente gasta a conexao retransmitindo.
+  rssi_minimo_dbm: -67
+
+  # Densidade de projeto, em APs por 1000 m2. Um AP cobre bem uns 250 m2 em
+  # 5 GHz a 80 MHz em ambiente de escritorio.
+  aps_por_1000_m2: 4

@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    # O projeto foi escrito e testado no Windows. Rodar a suite no mesmo SO
+    # evita que um pressuposto de plataforma passe aqui e quebre no Linux.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Conferir encoding dos arquivos de texto
+        # Neste host ja surgiram ideogramas CJK acidentais em arquivo escrito
+        # com acento. Nao e erro de logica: e corrupcao de encoding, que muda o
+        # conteudo e passa despercebida. Falhar aqui e mais barato.
+        run: python tools/verificar_encoding.py
+
+      - name: Verificar que o pacote importa
+        run: python -c "import wifisurvey; print(wifisurvey.__version__)"
+
+      - name: O relatorio de um andar roda e grava HTML e PNG
+        # Primeira metade do criterio de aceite: a CLI tem de produzir os dois
+        # arquivos, nao um traceback.
+        run: |
+          python -m wifisurvey relatorio dados/varrimento-andar1.csv --planta dados/planta-andar1.svg --saida saida/relatorio-andar1.html --png saida/mapa-andar1.png
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "esperava codigo de saida 0, veio $LASTEXITCODE"
+            exit 1
+          }
+
+      - name: Os tres andares rodam
+        # Cada andar tem de gerar sem erro. O andar3 e o caso critico: e o
+        # que aciona o caminho de "falta de cobertura", que nao aparece nos
+        # outros dois.
+        run: |
+          python -m wifisurvey comparar
+          python -m wifisurvey relatorio --andar andar2 --saida saida/r2.html
+          python -m wifisurvey relatorio --andar andar3 --saida saida/r3.html
+
+      - name: A CLI de canais valida um canal invalido
+        # Segunda metade do criterio de aceite: a ferramenta precisa recusar
+        # entrada errada. O canal 70 em 5 GHz e a lacuna de DFS, onde nao se
+        # projeta.
+        run: |
+          python -m wifisurvey canais --banda 5 --canal 149
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "o canal 149 deveria ser valido"
+            exit 1
+          }
+          python -m wifisurvey canais --banda 5 --canal 70
+          if ($LASTEXITCODE -ne 1) {
+            Write-Error "esperava codigo de saida 1 para o canal 70, veio $LASTEXITCODE"
+            exit 1
+          }
+
+      - name: Rodar testes com cobertura
+        # fail_under=70 esta no pyproject.toml; cobertura abaixo derruba o build.
+        run: python -m pytest --cov=wifisurvey --cov-report=term-missing --cov-report=xml
+
+      - name: Conferir cobertura minima
+        run: python -m coverage report --fail-under=70
+
+      - name: Prova de aceite
+        # Sobe os tres CSVs do repositorio e exige que cada andar acione o
+        # detector que ele existe para demonstrar: conflito de canal no andar1,
+        # aglomerado no andar2, falta de cobertura no andar3. E o teste que a
+        # suite nao cobre sozinha - ela prova que cada funcao funciona, nao que
+        # os dados que acompanham o repositorio se comportam como o README
+        # promete.
+        run: python tools/verificar_aceite.py
+
+      - name: Conferir que os exemplos comitados batem com o codigo
+        # Regenera os exemplos e falha se houver diferenca. O mapa de calor
+        # depende da interpolacao do sinal, que depende do CSV, que e gerado
+        # com semente fixa. Sem isso, um exemplo desatualizado ensinaria o
+        # numero errado para quem le.
+        run: |
+          python tools/gerar_dados.py
+          python tools/gerar_exemplos.py
+          git diff --exit-code -- dados/ exemplos/
+
+      - name: Conferir que o exemplo nao carrega caminho da maquina
+        # O relatorio vai para commit e para issue de ticket. Um caminho
+        # absoluto do Windows ou o home de quem gerou estraga a revisao do diff
+        # e ainda entrega informacao da maquina de desenvolvimento.
+        run: python tools/verificar_exemplo_limpo.py
