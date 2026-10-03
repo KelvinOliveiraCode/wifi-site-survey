@@ -55,8 +55,12 @@ jobs:
       - name: A CLI de canais valida um canal invalido
         # Segunda metade do criterio de aceite: a ferramenta precisa recusar
         # entrada errada. O canal 70 em 5 GHz e a lacuna de DFS, onde nao se
-        # projeta.
+        # projeta. O `$PSNativeCommandUseErrorActionPreference` desligado e
+        # obrigatorio: no pwsh do runner um codigo de saida diferente de zero
+        # vira erro terminante e aborta o passo antes do `if` que confere o
+        # codigo, que e justamente o que este passo mede.
         run: |
+          $PSNativeCommandUseErrorActionPreference = $false
           python -m wifisurvey canais --banda 5 --canal 149
           if ($LASTEXITCODE -ne 0) {
             Write-Error "o canal 149 deveria ser valido"
