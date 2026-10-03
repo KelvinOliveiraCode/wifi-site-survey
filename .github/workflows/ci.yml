@@ -96,10 +96,20 @@ jobs:
         # depende da interpolacao do sinal, que depende do CSV, que e gerado
         # com semente fixa. Sem isso, um exemplo desatualizado ensinaria o
         # numero errado para quem le.
+        #
+        # A excecao sao os .png e os .html que embutem o mapa como data URI:
+        # o bloco IDAT do PNG e comprimido com zlib, e a saida do zlib muda
+        # entre a versao 1.3 do CPython 3.11 e a zlib-ng do 3.14. A imagem
+        # fica visualmente identica, mas os bytes mudam, e um `git diff` byte a
+        # byte reprovaria o build em metade dos interpretadores. O que se
+        # compara aqui e o conteudo textual de verdade: os CSV de dados, os
+        # .txt de saida e o HTML sem o base64. O tamanho do PNG tambem e
+        # conferido, porque ele muda se a interpolacao mudar.
         run: |
           python tools/gerar_dados.py
           python tools/gerar_exemplos.py
-          git diff --exit-code -- dados/ exemplos/
+          git diff --exit-code -- dados/ exemplos/*.txt
+          python tools/conferir_exemplos.py
 
       - name: Conferir que o exemplo nao carrega caminho da maquina
         # O relatorio vai para commit e para issue de ticket. Um caminho
