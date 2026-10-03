@@ -240,7 +240,7 @@ faltam 3 AP(s): 5 instalado(s) para 8 necessario(s)
   em vez de cobertura, e o mapa de calor mostra exatamente o esperado. So a
   distancia entre vizinhos denuncia.
 - **O mapa precisa dizer que e estimativa.** Entre dois pontos visitados o valor
-  e desenhado, nao observado; sem isso na legenda, o relatório vira prova de
+  e desenhado, nao observado; sem isso na legenda, o relatorio vira prova de
   algo que ninguem mediu.
 
 ### Limitacoes
