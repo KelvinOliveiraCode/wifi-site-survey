@@ -71,6 +71,9 @@ jobs:
             Write-Error "esperava codigo de saida 1 para o canal 70, veio $LASTEXITCODE"
             exit 1
           }
+          # O runner fecha o passo com `exit $LASTEXITCODE`; sem este exit 0 o
+          # codigo 1 esperado da CLI vira codigo do passo e o CI fica vermelho.
+          exit 0
 
       - name: Rodar testes com cobertura
         # fail_under=70 esta no pyproject.toml; cobertura abaixo derruba o build.
