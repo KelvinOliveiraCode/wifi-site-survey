@@ -28,23 +28,27 @@ EXEMPLOS = RAIZ / "exemplos"
 
 DATA_URI = re.compile(r'data:image/png;base64,[A-Za-z0-9+/=]+')
 
+# Marcador fixo, sem o tamanho. O tamanho do base64 e justamente o que muda
+# entre a zlib 1.3 do CPython 3.11 e a zlib-ng do 3.14: a compressao do bloco
+# IDAT tem um tamanho diferente, entao o base64 embutido tambem. Escrever o
+# tamanho no marcador fazia a comparacao reprovar nos dois runners, porque o
+# numero que ela media era justamente o ruido que ela existe para ignorar.
+MARCADOR_PNG = "data:image/png;base64,<png>"
+
 
 def sem_binario(html: str) -> str:
-    """Troca o PNG embutido por um marcador de tamanho.
+    """Troca o PNG embutido por um marcador fixo.
 
-    Substitui o PNG embutido por um marcador de tamanho.
+    Substitui o PNG embutido por um marcador fixo.
 
     Args:
         html: O conteudo do relatorio.
 
     Returns:
-        O mesmo HTML sem o base64, com o tamanho do PNG no lugar.
+        O mesmo HTML sem o base64, com um marcador no lugar.
     """
 
-    def troca(match: re.Match[str]) -> str:
-        return f"data:image/png;base64,<{len(match.group(0))} bytes>"
-
-    return DATA_URI.sub(troca, html)
+    return DATA_URI.sub(MARCADOR_PNG, html)
 
 
 def main() -> int:
