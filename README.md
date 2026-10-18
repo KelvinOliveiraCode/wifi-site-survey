@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**English** · [Português (Brasil)](README.md)
+[English](README.en.md) · **Português (Brasil)**
 
 </div>
 
@@ -18,26 +18,26 @@ Levantamento de Wi-Fi por andar: mapa de calor de RSSI, dimensionamento de AP e 
 
 ---
 
-## Quick Start
+## Início Rápido
 
 ```bash
-# Clone and enter
+# Clone e entre
 git clone https://github.com/KelvinOliveiraCode/<repo>.git
 cd <repo>
 
-# Install dependencies
-# No requirements.txt detected
+# Instale dependências
+# Nenhum requirements.txt detectado
 
-# Run the project
+# Execute o projeto
 python main.py
 
-# Run tests
+# Execute os testes
 pytest
 ```
 
 ## Como funciona
 
-Clean, modular structure with separation of concerns.
+Estrutura limpa e modular com separação de responsabilidades.
 
 ---
 
