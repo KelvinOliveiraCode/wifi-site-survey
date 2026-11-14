@@ -10,7 +10,7 @@
 
 ## Status
 
-An educational lab, working and tested (266 tests — the largest in the portfolio).
+An educational lab, working and tested (266 tests, the largest in the portfolio).
 
 ## Features
 
@@ -33,7 +33,7 @@ A `wifisurvey` package with `leitor` (CSV), `plano` (network model), `capacidade
 
 ## Repository layout
 
-```
+```text
 wifi-site-survey/
 ├── src/wifisurvey/  # leitor · plano · capacidade · interferencia · mapa · cli
 ├── dados/           # measurement CSVs per floor
@@ -76,4 +76,4 @@ An individual project by Kelvin Oliveira, built with orchestrated AI agents and 
 
 ## License and author
 
-MIT — Copyright (c) 2026 Kelvin Rebelo de Oliveira. Author: [Kelvin Oliveira](https://github.com/KelvinOliveiraCode) · [Portfolio](https://kelvinoliveiracode.github.io/portfolio/)
+MIT. Copyright (c) 2026 Kelvin Rebelo de Oliveira. Author: [Kelvin Oliveira](https://github.com/KelvinOliveiraCode) · [Portfolio](https://kelvinoliveiracode.github.io/portfolio/)

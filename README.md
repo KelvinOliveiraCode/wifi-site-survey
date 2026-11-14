@@ -10,7 +10,7 @@
 
 ## Status
 
-Laboratório educacional funcional e testado (266 testes — o maior do portfólio).
+Laboratório educacional funcional e testado (266 testes, o maior do portfólio).
 
 ## Funcionalidades
 
@@ -33,7 +33,7 @@ Pacote `wifisurvey` com `leitor` (CSV), `plano` (modelo de rede), `capacidade` (
 
 ## Estrutura
 
-```
+```text
 wifi-site-survey/
 ├── src/wifisurvey/  # leitor · plano · capacidade · interferencia · mapa · cli
 ├── dados/           # CSVs de medição por andar
@@ -76,4 +76,4 @@ Projeto individual de Kelvin Oliveira, construído com agentes de IA orquestrado
 
 ## Licença e autor
 
-MIT — Copyright (c) 2026 Kelvin Rebelo de Oliveira. Autor: [Kelvin Oliveira](https://github.com/KelvinOliveiraCode) · [Portfólio](https://kelvinoliveiracode.github.io/portfolio/)
+MIT. Copyright (c) 2026 Kelvin Rebelo de Oliveira. Autor: [Kelvin Oliveira](https://github.com/KelvinOliveiraCode) · [Portfólio](https://kelvinoliveiracode.github.io/portfolio/)
